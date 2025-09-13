@@ -5,5 +5,5 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
     plugins: [vue(), tailwindcss(),],
-    base: '/template_ocr_engine_ui/',
+    base: 'https://abhinavkbij.github.io/template_ocr_engine_ui/',
 })
