@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
+  <div class="w-full max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
     <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">Login</h2>
 
     <form @submit.prevent="handleLogin">
@@ -46,6 +46,7 @@
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref } from 'vue'

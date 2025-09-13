@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-lg mx-auto bg-white rounded-lg shadow-md p-8">
+  <div class="w-full max-w-lg mx-auto bg-white rounded-lg shadow-md p-8">
     <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">Register</h2>
 
     <form @submit.prevent="handleRegister">
@@ -59,21 +59,10 @@
       </button>
     </form>
 
-    <div class="mt-6 text-center">
-      <router-link to="/login" class="text-blue-600 hover:text-blue-700">
-        Already have an account? Login here
-      </router-link>
-    </div>
-
-    <div v-if="error" class="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-      {{ error }}
-    </div>
-
-    <div v-if="success" class="mt-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
-      {{ success }}
-    </div>
   </div>
 </template>
+
+// ... existing code ...
 
 <script setup>
 import { ref } from 'vue'
@@ -101,11 +90,16 @@ const handleRegister = async () => {
   try {
     const response = await apiService.register(form.value)
 
+    console.log('response from apiService.register is: ', response);
+    // console.log('response.json is: ', response);
+    // const jsonResponse = await response.json();
+    // console.log('jsonResponse is: ', jsonResponse);
     if (response.api_key) {
       const authStore = useAuthStore();
       const emailToPass = form.value.email;
       authStore.setUserEmail(emailToPass);
-
+      // console.log('response.api_key: ', response.api_key);
+      // console.log('form.value.email: ', form.value.email);
       localStorage.setItem(`${form.value.email}`, response.api_key);
       success.value = 'Account created successfully! Please check your email for verification.';
       await router.push('/dashboard');

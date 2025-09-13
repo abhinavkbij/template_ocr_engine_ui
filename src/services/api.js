@@ -9,7 +9,7 @@ class ApiService {
             loginEndpoint: '/auth/login',
             registerEndpoint: '/registerMe',
             processEndpoint: '/processFile',
-            templatesEndpoint: '/templates'
+            templatesEndpoint: '/list_templates'
         }
 
         // Load saved config
@@ -25,16 +25,17 @@ class ApiService {
 
     async requestPost(endpoint, options = {}) {
         const url = `${this.config.baseUrl}${endpoint}`
-        const token = localStorage.getItem(`${options.body.email}`);
+        // const token = localStorage.getItem(`${options.body.email}`);
 
         const defaultHeaders = {
             'Content-Type': 'application/json',
         }
 
-        if (token) {
+        // console.log("token is: ", token);
+        // if (token) {
             // defaultHeaders.Authorization = `Bearer ${token}`
-            defaultHeaders['ocr-api-key'] = token;
-        }
+            // defaultHeaders['ocr-api-key'] = token;
+        // }
 
         // if (this.config.apiKey) {
         //     defaultHeaders['X-API-Key'] = this.config.apiKey
@@ -54,12 +55,12 @@ class ApiService {
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    const authstore = useAuthStore();
-                    const userEmail = authstore.userEmail;
+                    // const authstore = useAuthStore();
+                    // const userEmail = authstore.userEmail;
                     // localStorage.removeItem('ocr-api-key')
                     // localStorage.removeItem('userEmail')
-                    authstore.setUserEmail(null);
-                    localStorage.removeItem(`${userEmail}`);
+                    // authstore.setUserEmail(null);
+                    // localStorage.removeItem(`${userEmail}`);
                     window.location.href = '/login'
                     // throw new Error('Session expired. Please login again.')
                 }
@@ -79,13 +80,23 @@ class ApiService {
         try {
             // const queryString = new URLSearchParams(options.body).toString();
             // console.log("query string is: ", queryString);
-            const token = localStorage.getItem(`${options.body.email}`);
-            const url = `${endpoint}/${token}`;
+            const url = `${this.config.baseUrl}${endpoint}`
+            if (options.body !== undefined && options.body !== null && options.body !== '') {
+                const token = localStorage.getItem(`${options.body.email}`);
+                const url = `${this.config.baseUrl}${endpoint}/${token}`
+            }
+            else {
+                const url = `${this.config.baseUrl}${endpoint}`;
+            }
             console.log("url is: ", url);
             const response = await fetch(url);
-            return await response.json();
+            const res = await response.json();
+            console.log("response from get request is: ", res);
+            console.log("response from get request is: ", res.status);
+            console.log("response from get request is: ", res.templates);
+            return res.templates;
         } catch (error) {
-            console.error('Login API request failed:', error)
+            console.error('Get API request failed for endpoint:', endpoint, "error is: ", error)
             throw error
         }
     }
@@ -101,29 +112,38 @@ class ApiService {
 
     async register(userData) {
         console.log("user data is: ", userData);
-        const response = await this.requestPost(this.config.registerEndpoint, {
+        const res = await this.requestPost(this.config.registerEndpoint, {
             method: 'POST',
             body: JSON.stringify(userData)
         })
-        console.log("response is: ", response);
+        // console.log("response is: ", response);
+        const response = await res.json();
+
         // localStorage.setItem('ocr-api-key', response.api_key);
         return response;
     }
 
     // File processing
     async processFiles(formData) {
+        const authStore = useAuthStore();
+        const userEmail = authStore.userEmail;
+        const authToken = localStorage.getItem(`${userEmail}`);
+        console.log("auth token in processFiles is: ", authToken);
+
         const response = await this.requestPost(this.config.processEndpoint, {
             method: 'POST',
-            headers: {}, // Let browser set Content-Type for FormData
+            headers: {'ocr-api-key': authToken}, // Let browser set Content-Type for FormData
             body: formData
         })
-        console.log("response from process files is: ", response);
-        return response;
+        return await response.json();
+        // console.log("response from process files is: ", response);
+
+        // return response;
     }
 
     // Templates
     async getTemplates() {
-        return this.requestPost(this.config.templatesEndpoint)
+        return this.requestGet(this.config.templatesEndpoint)
     }
 
     async createTemplate(template) {

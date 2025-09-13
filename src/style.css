@@ -1,87 +1,89 @@
 @import "tailwindcss";
+@import 'highlight.js/styles/vs.css'; /* Changed to VS Code style theme */
 /*@import 'tailwindcss/base';*/
 /*@import 'tailwindcss/components';*/
 @import 'tailwindcss/utilities';
 /*@reference "./global.css";*/
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+    color-scheme: light dark;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #242424;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+    font-weight: 500;
+    color: #646cff;
+    text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+    color: #535bf2;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+    margin: 0;
+    display: flex;
+    place-items: center;
+    min-width: 320px;
+    min-height: 100vh;
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+    font-size: 3.2em;
+    line-height: 1.1;
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    background-color: #1a1a1a;
+    cursor: pointer;
+    transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+    border-color: #646cff;
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+    outline: 4px auto -webkit-focus-ring-color;
 }
 
 .card {
-  padding: 2em;
+    padding: 2em;
 }
 
+/* Remove max-width constraint from #app */
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
 }
 
 @media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+    :root {
+        color: #213547;
+        background-color: #ffffff;
+    }
+    a:hover {
+        color: #747bff;
+    }
+    button {
+        background-color: #f9f9f9;
+    }
 }
 
 /*// style.css (Tailwind CSS base)*/
@@ -115,6 +117,96 @@ button:focus-visible {
     .card {
         @apply bg-white rounded-lg shadow-md p-6;
     }
+
+    /* IDE-style JSON editor container */
+    .json-editor-container {
+        width: 100%;
+        background-color: #1e1e1e;
+        border: 1px solid #3c3c3c;
+        border-radius: 4px;
+        overflow: auto;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .json-editor {
+        margin: 0 !important;
+        padding: 16px !important;
+        background: #1e1e1e !important;
+        color: #d4d4d4 !important;
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+        text-align: left !important;
+        white-space: pre !important;
+        word-spacing: normal !important;
+        word-break: normal !important;
+        word-wrap: normal !important;
+        tab-size: 2 !important;
+        hyphens: none !important;
+        overflow: auto !important;
+        min-height: 200px;
+    }
+
+    .json-editor code {
+        background: transparent !important;
+        padding: 0 !important;
+        font-family: inherit !important;
+        font-size: inherit !important;
+        line-height: inherit !important;
+        color: inherit !important;
+        display: block !important;
+        text-align: left !important;
+        white-space: pre !important;
+        word-spacing: normal !important;
+        word-break: normal !important;
+        word-wrap: normal !important;
+        tab-size: 2 !important;
+    }
+
+    /* Dark theme JSON syntax highlighting */
+    .json-editor .hljs {
+        background: transparent !important;
+        color: #d4d4d4 !important;
+    }
+
+    .json-editor .hljs-attr {
+        color: #9cdcfe !important;
+    }
+
+    .json-editor .hljs-string {
+        color: #ce9178 !important;
+    }
+
+    .json-editor .hljs-number {
+        color: #b5cea8 !important;
+    }
+
+    .json-editor .hljs-literal {
+        color: #569cd6 !important;
+    }
+
+    .json-editor .hljs-punctuation {
+        color: #d4d4d4 !important;
+    }
+}
+
+/* Custom scrollbar for JSON editor */
+.json-editor-container::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+.json-editor-container::-webkit-scrollbar-track {
+    background: #2d2d30;
+}
+
+.json-editor-container::-webkit-scrollbar-thumb {
+    background: #424245;
+    border-radius: 6px;
+}
+
+.json-editor-container::-webkit-scrollbar-thumb:hover {
+    background: #4e4e50;
 }
 
 /* Custom scrollbar */
@@ -133,4 +225,9 @@ button:focus-visible {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
+}
+
+/* Horizontal scrollbar for JSON display */
+::-webkit-scrollbar:horizontal {
+    height: 6px;
 }

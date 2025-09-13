@@ -1,7 +1,7 @@
-// components/FileUpload.vue
 <template>
-  <div class="space-y-6">
-    <div class="bg-white rounded-lg shadow-md p-6">
+  <div class="w-full space-y-6">
+    <div class="flex w-xl m-auto justify-center">
+    <div class="w-full bg-white rounded-lg shadow-md p-6">
       <h1 class="text-2xl font-bold text-gray-800 mb-6">Upload Files</h1>
 
       <!-- Template Selection -->
@@ -12,8 +12,8 @@
             class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">No template (Generic extraction)</option>
-          <option v-for="template in templates" :key="template.id" :value="template.id">
-            {{ template.name }}
+          <option v-for="template in templates" :key="template" :value="template">
+            {{ template }}
           </option>
         </select>
       </div>
@@ -56,13 +56,13 @@
       <!-- Selected Files -->
       <div v-if="selectedFiles.length > 0" class="mt-6">
         <h3 class="text-lg font-semibold text-gray-700 mb-4">Selected Files</h3>
-        <div class="space-y-2">
+        <div class="flex justify-between items-center space-y-2">
           <div
               v-for="(file, index) in selectedFiles"
               :key="index"
-              class="flex items-center justify-between bg-gray-50 rounded-lg p-3"
+              class="flex w-xl justify-between bg-gray-50 rounded-lg p-3"
           >
-            <div class="flex items-center space-x-3">
+            <div class="flex space-x-3 items-center">
               <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
               </svg>
@@ -83,40 +83,21 @@
         <button
             @click="uploadFiles"
             :disabled="uploading"
-            class="mt-4 w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-3 rounded-md font-medium transition-colors"
+            class="mt-4 w-xs bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-gray-300 py-3 rounded-md font-medium transition-colors"
         >
           {{ uploading ? 'Processing...' : `Process ${selectedFiles.length} File(s)` }}
         </button>
       </div>
     </div>
+    </div>
 
     <!-- Processing Results -->
-    <div v-if="results.length > 0" class="bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-xl font-semibold text-gray-800 mb-4">Processing Results</h2>
-      <div class="space-y-4">
-        <div
-            v-for="result in results"
-            :key="result.id"
-            class="border rounded-lg p-4"
-            :class="result.status === 'success' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'"
-        >
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="font-medium text-gray-900">{{ result.fileName }}</h3>
-            <span
-                class="px-2 py-1 text-xs rounded-full"
-                :class="result.status === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-            >
-              {{ result.status }}
-            </span>
-          </div>
-
-          <div v-if="result.status === 'success' && result.extractedData">
-            <h4 class="text-sm font-medium text-gray-700 mb-2">Extracted Data:</h4>
-            <pre class="text-xs bg-white p-3 rounded border overflow-auto max-h-40">{{ JSON.stringify(result.extractedData, null, 2) }}</pre>
-          </div>
-
-          <div v-if="result.status === 'error'" class="text-sm text-red-600">
-            {{ result.error }}
+    <div v-if="results.length > 0" class="w-full">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Processing Results</h2>
+        <div class="w-full">
+          <div class="json-editor-container">
+            <pre class="json-editor"><code ref="codeBlock" class="language-json"></code></pre>
           </div>
         </div>
       </div>
@@ -125,8 +106,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick, watch } from 'vue'
 import { apiService } from '../services/api.js'
+import {useAuthStore} from "../stores/auth.js";
+import hljs from 'highlight.js/lib/core';
+import json from 'highlight.js/lib/languages/json';
+
+// Register the languages you need
+hljs.registerLanguage('json', json);
 
 const selectedTemplate = ref('')
 const templates = ref([])
@@ -135,11 +122,25 @@ const uploading = ref(false)
 const results = ref([])
 const dragOver = ref(false)
 const fileInput = ref(null)
+const codeBlock = ref(null)
+
+// Watch for changes in results and highlight the code
+watch(results, async (newResults) => {
+  if (newResults.length > 0) {
+    await nextTick()
+    if (codeBlock.value) {
+      const formattedJson = JSON.stringify(newResults, null, 2)
+      codeBlock.value.textContent = formattedJson
+      hljs.highlightElement(codeBlock.value)
+    }
+  }
+}, { immediate: true })
+
 
 onMounted(async () => {
   try {
-    // templates.value = await apiService.getTemplates()
-    templates.value = null
+    templates.value = await apiService.getTemplates()
+    // templates.value =
   } catch (error) {
     console.error('Error loading templates:', error)
   }
@@ -193,13 +194,12 @@ const uploadFiles = async () => {
       formData.append('output', 'entities')
     })
 
-    // if (selectedTemplate.value) {
-      // formData.append('templateId', selectedTemplate.value)
-    // }
-
     const response = await apiService.processFiles(formData)
+
     console.log('API Response:', response);
-    results.value = response.results || []
+    console.log('API Response Entities:', response.entities);
+    console.log('API Response Status:', response.status);
+    results.value = response.entities || []
 
     // Clear selected files after successful upload
     selectedFiles.value = []
@@ -220,3 +220,7 @@ const uploadFiles = async () => {
   }
 }
 </script>
+
+<style scoped>
+@import 'highlight.js/styles/github.css';
+</style>

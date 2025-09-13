@@ -1,7 +1,7 @@
 // components/Navbar.vue
 <template>
   <nav class="bg-white shadow-lg border-b">
-    <div class="container mx-auto px-4">
+    <div class="w-full px-4">
       <div class="flex justify-between items-center py-4">
         <div class="flex items-center space-x-8">
           <h1 class="text-xl font-bold text-gray-800">OCR Engine</h1>
@@ -31,6 +31,7 @@
     </div>
   </nav>
 </template>
+
 
 <script setup>
 import { ref, onMounted } from 'vue'
